@@ -4,4 +4,6 @@
 wclean incompressibleTwoPhaseThermalMixture
 wclean interThermalPhaseChangeFoam
 cd Libraries
-./Allwclean.sh
+source Allwclean.sh
+cd ../utilities
+wclean interThermalPhaseChangeFoam_Cond
