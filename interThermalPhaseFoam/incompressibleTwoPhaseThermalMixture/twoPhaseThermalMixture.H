@@ -77,6 +77,10 @@ protected:
 	dimensionedScalar cp1_;
 	dimensionedScalar cp2_;
 
+	//Added by Sanjay
+	dimensionedScalar lambda1_;
+	dimensionedScalar lambda2_;
+
 	const volVectorField& U_;
 	const surfaceScalarField& phi_;
 
@@ -184,6 +188,18 @@ public:
         const dimensionedScalar& cp2() const
         {
             return cp2_;
+        };
+
+        //- Return const-access to phase1 conductivity
+        const dimensionedScalar& lambda1() const
+        {
+            return lambda1_;
+        }
+
+        //- Return const-access to phase2 conductivity
+        const dimensionedScalar& lambda2() const
+        {
+            return lambda2_;
         };
 
         //- Return the dynamic laminar viscosity

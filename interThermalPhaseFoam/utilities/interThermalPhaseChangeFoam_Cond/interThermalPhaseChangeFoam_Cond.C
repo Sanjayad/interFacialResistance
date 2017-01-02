@@ -79,7 +79,10 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (runTime.run())
+	//Final convergence runs
+	int FinalRuns = 0;
+
+    while (runTime.run() && (FinalRuns < 10) )
     {
         #include "readTimeControls.H"
         #include "FourierNo.H"
@@ -96,7 +99,7 @@ int main(int argc, char *argv[])
 
         //For now, the energy equation is only 1-way coupled with the momentum/pressure equations,
         //so it can be solved explicitly, and separately here
-        #include "EEqn.H"
+        #include "TEqn.H"
 
 	Info<< "****Phase change energy: " << gSum( phaseChangeModel->Q_pc()*mesh.V() ) << " W" << endl;
 
@@ -105,7 +108,20 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
+
+		//Final runs after Q_PC no longer relaxed
+		if (Q_PC_Factor == 1.0)
+		{ FinalRuns++; }
+
     }
+
+	//Final writeout
+	p_rgh.write();
+	alpha1.write();
+	U.write();
+	phi.write();
+	T.write();
+	H.write();
 
     Info<< "End\n" << endl;
 

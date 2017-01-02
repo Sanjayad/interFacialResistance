@@ -76,6 +76,10 @@ class interfacialResistance
 	//- Phase change heat
 	volScalarField Q_pc_;
 
+	//- Phase change coefficients
+	volScalarField T_sp_coeff_;
+	volScalarField T_sc_coeff_;
+	
 	//- Graph of mesh grid, used for finding interface cells
 	MeshGraph InterfaceMeshGraph;
 
@@ -133,6 +137,16 @@ public:
 		{
 			return Q_pc_;
 		}
+
+		tmp<volScalarField> T_sp_coeff() const
+		{
+			return T_sp_coeff_;
+		}
+		tmp<volScalarField> T_sc_coeff() const
+		{
+			return T_sc_coeff_;
+		}
+
 
         //- Correct the thermalPhaseChange model
         void correct()

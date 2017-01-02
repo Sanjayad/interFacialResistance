@@ -63,6 +63,32 @@ Foam::thermalPhaseChangeModels::interfacialResistance::interfacialResistance
 		mesh_,
 		dimensionedScalar( "dummy", dimensionSet(1,-1,-3,0,0,0,0), 0 )
     ),
+	T_sp_coeff_
+    (
+        IOobject
+        (
+            "T_sp_coeff",
+            T_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+		mesh_,
+		dimensionedScalar( "dummy", dimensionSet(1,-1,-3,-1,0,0,0), 0 )
+    ),
+	T_sc_coeff_
+    (
+        IOobject
+        (
+            "T_sc_coeff",
+            T_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+		mesh_,
+		dimensionedScalar( "dummy", dimensionSet(1,-1,-3,0,0,0,0), 0 )
+    ),
 	InterfaceMeshGraph( mesh_, alpha1 ),
     InterfaceField_
     (
@@ -213,10 +239,12 @@ Info << "vlv = " << v_lv << endl;
 Info << "dtUtilizedByTheThermalPhaseChangeModel = " << dT.value() << endl;
 
 	//limited phase change heat
+	T_sp_coeff_.internalField() = hi*interfaceArea/mesh_.V();
+	T_sc_coeff_.internalField() = -hi*interfaceArea*T_sat_/mesh_.V();
 	//Q_pc_.internalField() = hi*interfaceArea*(T_-T_sat_)/mesh_.V(); 
 	forAll(mesh_.cells(),pI)
 	{
-		threshold_[pI] = ( (alpha1_[pI] > 0.01) && (alpha1_[pI] < 0.99) ) ? 1.0 : 0.0; 
+		threshold_[pI] = ( (alpha1_[pI] >= 0.00) && (alpha1_[pI] <= 1.00) ) ? 1.0 : 0.0; 
 	}
 	
 

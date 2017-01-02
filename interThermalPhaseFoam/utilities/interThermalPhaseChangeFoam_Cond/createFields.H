@@ -31,6 +31,15 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
         mesh
     );
 
+	const scalar smoothingFactor = 0.5;
+	//pass1
+	alpha1 = smoothingFactor*(fvc::average(fvc::interpolate(alpha1))) + (1.0 - smoothingFactor)*alpha1;
+	//pass2
+	alpha1 = smoothingFactor*(fvc::average(fvc::interpolate(alpha1))) + (1.0 - smoothingFactor)*alpha1;
+	//pass3
+	alpha1 = smoothingFactor*(fvc::average(fvc::interpolate(alpha1))) + (1.0 - smoothingFactor)*alpha1;
+
+
     Info<< "Reading field U\n" << endl;
     volVectorField U
     (
@@ -86,6 +95,8 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
     const dimensionedScalar& rho2 = twoPhaseProperties.rho2();
     const dimensionedScalar& cp1 = twoPhaseProperties.cp1();
     const dimensionedScalar& cp2 = twoPhaseProperties.cp2();
+    const dimensionedScalar& lambda1 = twoPhaseProperties.lambda1();
+    const dimensionedScalar& lambda2 = twoPhaseProperties.lambda2();
 
     // Need to store rho for ddt(rho, U)
     volScalarField rho
@@ -102,6 +113,22 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
     );
 
     rho.oldTime();
+
+    volScalarField rhoCp
+    (
+        IOobject
+        (
+            "rho",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT
+        ),
+        alpha1*rho1*cp1 + (scalar(1) - alpha1)*rho2*cp2,
+        alpha1.boundaryField().types()
+    );
+
+    rhoCp.oldTime();
+
 
     // Mass flux
     // Initialisation does not matter because rhoPhi is reset after the
@@ -265,6 +292,10 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
 
 	//First run thermalPhaseChangeModel correct to get initial values
 	phaseChangeModel->correct();
+
+	//Q_pc initial magnitude and relaxation factor
+	scalar Q_PC_Factor = runTime.controlDict().lookupOrDefault<scalar>("Q_PC_InitialFactor", 1E-6);
+	scalar Q_PC_Relax  = runTime.controlDict().lookupOrDefault<scalar>("Q_PC_RelaxFactor", 1E-6);
 
 /*
 	volScalarField Q_pc_accum

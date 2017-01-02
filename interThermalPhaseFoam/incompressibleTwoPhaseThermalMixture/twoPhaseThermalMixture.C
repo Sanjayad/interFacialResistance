@@ -150,6 +150,11 @@ Foam::twoPhaseThermalMixture::twoPhaseThermalMixture
 	cp1_( subDict(phase1Name_).lookup("cp") ),
 	cp2_( subDict(phase2Name_).lookup("cp") ),
 
+	//Get the conductivity from the dictionary
+	lambda1_( subDict(phase1Name_).lookup("lambda") ),
+	lambda2_( subDict(phase2Name_).lookup("lambda") ),
+
+
     U_(U),
     phi_(phi),
 

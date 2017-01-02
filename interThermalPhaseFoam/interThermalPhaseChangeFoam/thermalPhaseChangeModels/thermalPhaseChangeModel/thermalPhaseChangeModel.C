@@ -99,6 +99,49 @@ Foam::tmp<Foam::volScalarField> Foam::thermalPhaseChangeModel::PCV() const
 	}
 }
 
+
+Foam::tmp<Foam::volScalarField> Foam::thermalPhaseChangeModel::T_sp_coeff() const
+{
+	return tmp<volScalarField>
+	(
+		new volScalarField
+		(			
+			IOobject
+			(
+				"T_sp_coeff",
+				T_.time().timeName(),
+				T_.mesh(),
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			T_.mesh(),
+			dimensionedScalar( "dummy", dimensionSet(1,2,-3,-1,0,0,0), 0 )
+		)
+	);
+}
+
+
+Foam::tmp<Foam::volScalarField> Foam::thermalPhaseChangeModel::T_sc_coeff() const
+{
+	return tmp<volScalarField>
+	(
+		new volScalarField
+		(			
+			IOobject
+			(
+				"T_sc_coeff",
+				T_.time().timeName(),
+				T_.mesh(),
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			T_.mesh(),
+			dimensionedScalar( "dummy", dimensionSet(1,2,-3,0,0,0,0), 0 )
+		)
+	);
+}
+
+
 Foam::tmp<Foam::volScalarField> Foam::thermalPhaseChangeModel::alpha1Gen() const
 {
 	if (sw_alpha1Gen)

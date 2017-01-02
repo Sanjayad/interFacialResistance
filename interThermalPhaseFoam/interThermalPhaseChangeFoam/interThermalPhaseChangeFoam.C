@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 
         //For now, the energy equation is only 1-way coupled with the momentum/pressure equations,
         //so it can be solved explicitly, and separately here
-        #include "EEqn.H"
+        #include "TEqn.H"
 
         runTime.write();
 

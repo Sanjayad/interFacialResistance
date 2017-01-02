@@ -85,7 +85,8 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
     const dimensionedScalar& rho2 = twoPhaseProperties.rho2();
     const dimensionedScalar& cp1 = twoPhaseProperties.cp1();
     const dimensionedScalar& cp2 = twoPhaseProperties.cp2();
-
+    const dimensionedScalar& lambda1 = twoPhaseProperties.lambda1();
+    const dimensionedScalar& lambda2 = twoPhaseProperties.lambda2();
     // Need to store rho for ddt(rho, U)
     volScalarField rho
     (
@@ -101,6 +102,21 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
     );
 
     rho.oldTime();
+
+    volScalarField rhoCp
+    (
+        IOobject
+        (
+            "rho",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT
+        ),
+        alpha1*rho1*cp1 + (scalar(1) - alpha1)*rho2*cp2,
+        alpha1.boundaryField().types()
+    );
+
+    rhoCp.oldTime();
 
     // Mass flux
     // Initialisation does not matter because rhoPhi is reset after the

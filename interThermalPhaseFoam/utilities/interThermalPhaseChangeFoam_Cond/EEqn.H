@@ -33,6 +33,7 @@
 	label nEnergyLoops(readLabel(pimple.dict().lookup("nEnergyLoops")));
 	for (int EEqnCount=0; EEqnCount < nEnergyLoops; EEqnCount++)
 	{
+		phaseChangeModel->correct();		
 		//Form and solve the energy equation
 		fvScalarMatrix EEqn
 		(
