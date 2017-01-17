@@ -45,7 +45,7 @@
                 runTime.timeName(),
                 mesh
             ),
-		alpha1Gen_accum
+ 			phaseChangeModel->alpha1Gen()		
         );
 
 
