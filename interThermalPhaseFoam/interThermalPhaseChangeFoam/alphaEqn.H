@@ -64,6 +64,10 @@
         rhoPhi +=
             (runTime.deltaT()/totalDeltaT)
            *(phiAlpha*(rho1 - rho2) + phi*rho2); 
+
+        rhoPhiCp +=
+            (runTime.deltaT()/totalDeltaT)
+           *(phiAlpha*(rho1*cp1 - rho2*cp2) + phi*rho2*cp2); 		
     }
 
     Info<< "Liquid phase volume fraction = "

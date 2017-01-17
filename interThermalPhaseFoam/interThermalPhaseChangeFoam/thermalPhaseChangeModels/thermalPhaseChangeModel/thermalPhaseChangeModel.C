@@ -115,7 +115,7 @@ Foam::tmp<Foam::volScalarField> Foam::thermalPhaseChangeModel::T_sp_coeff() cons
 				IOobject::NO_WRITE
 			),
 			T_.mesh(),
-			dimensionedScalar( "dummy", dimensionSet(1,2,-3,-1,0,0,0), 0 )
+			dimensionedScalar( "dummy", dimensionSet(1,-1,-3,-1,0,0,0), 0 )
 		)
 	);
 }
@@ -136,7 +136,7 @@ Foam::tmp<Foam::volScalarField> Foam::thermalPhaseChangeModel::T_sc_coeff() cons
 				IOobject::NO_WRITE
 			),
 			T_.mesh(),
-			dimensionedScalar( "dummy", dimensionSet(1,2,-3,0,0,0,0), 0 )
+			dimensionedScalar( "dummy", dimensionSet(1,-1,-3,0,0,0,0), 0 )
 		)
 	);
 }

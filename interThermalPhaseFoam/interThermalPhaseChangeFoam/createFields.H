@@ -97,23 +97,40 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
             mesh,
             IOobject::READ_IF_PRESENT
         ),
-        alpha1*rho1 + (scalar(1) - alpha1)*rho2,
-        alpha1.boundaryField().types()
+        alpha1*rho1 + (scalar(1) - alpha1)*rho2
+//        alpha1.boundaryField().types()
     );
 
     rho.oldTime();
+
+    volScalarField cp
+    (
+        IOobject
+        (
+            "cp",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT
+        ),
+        //scalar(1) / ( alpha1/cp1 + (scalar(1) - alpha1)/cp2 )
+		( cp1*rho1*alpha1 + cp2*rho2*(1-alpha1) ) / ( rho1*alpha1 + (1-alpha1)*rho2 )		
+//        cp1.boundaryField().types()
+    );
+
+	cp.oldTime();	
 
     volScalarField rhoCp
     (
         IOobject
         (
-            "rho",
+            "rho*cp",
             runTime.timeName(),
             mesh,
-            IOobject::READ_IF_PRESENT
-        ),
-        alpha1*rho1*cp1 + (scalar(1) - alpha1)*rho2*cp2,
-        alpha1.boundaryField().types()
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),       
+		alpha1*rho1*cp1 + (scalar(1) - alpha1)*rho2*cp2
+        //alpha1.boundaryField().types()
     );
 
     rhoCp.oldTime();
@@ -121,6 +138,19 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
     // Mass flux
     // Initialisation does not matter because rhoPhi is reset after the
     // alpha1 solution before it is used in the U equation.
+    surfaceScalarField rhoPhiCp
+    (
+        IOobject
+        (
+            "rho*phi*cp",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        fvc::interpolate(rhoCp)*phi
+    );
+
     surfaceScalarField rhoPhi
     (
         IOobject
@@ -131,7 +161,8 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        rho1*phi
+		fvc::interpolate(rho)*phi        
+		//rho1*phi
     );
 
     // Construct incompressible turbulence model
@@ -293,44 +324,4 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
 
 	//First run thermalPhaseChangeModel correct to get initial values
 	phaseChangeModel->correct();
-
-	volScalarField Q_pc_accum
-	(
-		IOobject
-		(
-			"Q_pc_accum",
-			runTime.timeName(),
-			mesh,
-			IOobject::NO_READ,
-			IOobject::NO_WRITE
-		),
-		phaseChangeModel->Q_pc()
-	);
-
-	volScalarField PCV_accum
-	(
-		IOobject
-		(
-			"PCV_accum",
-			runTime.timeName(),
-			mesh,
-			IOobject::NO_READ,
-			IOobject::NO_WRITE
-		),
-		phaseChangeModel->PCV()
-	);
-
-	volScalarField alpha1Gen_accum
-	(
-		IOobject
-		(
-			"alpha1Gen_accum",
-			runTime.timeName(),
-			mesh,
-			IOobject::NO_READ,
-			IOobject::NO_WRITE
-		),
-		phaseChangeModel->alpha1Gen()
-	);
-
 

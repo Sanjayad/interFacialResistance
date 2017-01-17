@@ -351,7 +351,7 @@ Foam::tmp<Foam::volScalarField> Foam::twoPhaseThermalMixture::cp() const
 		new volScalarField
 		(
 			"cp",
-		( cp1_*rho1_*limitedAlpha1 + cp2_*rho2_*(scalar(1) - limitedAlpha1) )/( rho1_*limitedAlpha1 + rho2_*(scalar(1) - limitedAlpha1) )
+			( cp1_*rho1_*limitedAlpha1 + cp2_*rho2_*(scalar(1) - limitedAlpha1) )/( rho1_*limitedAlpha1 + rho2_*(scalar(1) - limitedAlpha1) )
 		)
 	);
 }

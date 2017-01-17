@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 
         //For now, the energy equation is only 1-way coupled with the momentum/pressure equations,
         //so it can be solved explicitly, and separately here
-        #include "TEqn.H"
+        #include "TEqn1.H"
 
         runTime.write();
 
@@ -137,6 +137,14 @@ int main(int argc, char *argv[])
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
     }
+
+	//Final writeout
+	p_rgh.write();
+	alpha1.write();
+	U.write();
+	phi.write();
+	T.write();
+	H.write();
 
     Info<< "End\n" << endl;
 

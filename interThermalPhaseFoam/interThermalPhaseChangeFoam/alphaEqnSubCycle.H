@@ -10,6 +10,18 @@ surfaceScalarField rhoPhi
     dimensionedScalar("0", dimensionSet(1, 0, -1, 0, 0), 0)
 );
 
+surfaceScalarField rhoPhiCp
+(
+    IOobject
+    (
+        "rhoPhiCp",
+        runTime.timeName(),
+        mesh
+    ),
+    mesh,
+    dimensionedScalar("0", dimensionSet(1, 2, -3, -1, 0), 0)
+);
+
 {
 	label nAlphaCorr(readLabel(pimple.dict().lookup("nAlphaCorr")));
 
@@ -46,4 +58,5 @@ surfaceScalarField rhoPhi
 	interface.correct();
 
 	rho == alpha1*rho1 + (scalar(1) - alpha1)*rho2;
+	rhoCp == alpha1*rho1*cp1 + (scalar(1) - alpha1)*rho2*cp2;
 }

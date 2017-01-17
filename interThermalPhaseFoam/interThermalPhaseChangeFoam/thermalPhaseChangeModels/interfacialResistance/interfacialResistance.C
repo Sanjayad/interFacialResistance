@@ -151,12 +151,6 @@ Foam::thermalPhaseChangeModels::interfacialResistance::interfacialResistance
 	//Read in the cond/evap int. thresholds
 	thermalPhaseChangeProperties_.lookup("CondThresh") >> CondThresh;
 	thermalPhaseChangeProperties_.lookup("EvapThresh") >> EvapThresh;
-	//thermalPhaseChangeProperties_.lookup("sigmaHat") >> sigmaHat;
-	//thermalPhaseChangeProperties_.lookup("R_g") >> R_g;
-Info << 'a' << endl;
-	//v_lv = (1.0/twoPhaseProperties_.rho2().value()) - (1.0/twoPhaseProperties_.rho1().value());
-	//hi = (2.0*sigmaHat/(2.0-sigmaHat)) * (h_lv_.value()*h_lv_.value()/(T_sat_.value()*v_lv)) * pow(1.0/(2.0*3.1416*R_g*T_sat_.value()),0.5);
-
 	correct();
 }
 
@@ -239,6 +233,8 @@ Info << "vlv = " << v_lv << endl;
 Info << "dtUtilizedByTheThermalPhaseChangeModel = " << dT.value() << endl;
 
 	//limited phase change heat
+	//T_sp_coeff_.internalField() = hi*interfaceArea/(mesh_.V()*twoPhaseProperties_.cp());
+	//T_sc_coeff_.internalField() = -hi*interfaceArea*T_sat_/(mesh_.V()*twoPhaseProperties_.cp());
 	T_sp_coeff_.internalField() = hi*interfaceArea/mesh_.V();
 	T_sc_coeff_.internalField() = -hi*interfaceArea*T_sat_/mesh_.V();
 	//Q_pc_.internalField() = hi*interfaceArea*(T_-T_sat_)/mesh_.V(); 
