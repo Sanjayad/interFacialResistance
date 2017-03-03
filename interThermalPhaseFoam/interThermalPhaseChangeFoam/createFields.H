@@ -31,6 +31,15 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
         mesh
     );
 
+	//Smoothing for alpha	
+	const scalar smoothingFactor = 0.5;
+	//pass1
+	alpha1 = smoothingFactor*(fvc::average(fvc::interpolate(alpha1))) + (1.0 - smoothingFactor)*alpha1;
+	//pass2
+	alpha1 = smoothingFactor*(fvc::average(fvc::interpolate(alpha1))) + (1.0 - smoothingFactor)*alpha1;
+	//pass3
+	alpha1 = smoothingFactor*(fvc::average(fvc::interpolate(alpha1))) + (1.0 - smoothingFactor)*alpha1;
+
     Info<< "Reading field U\n" << endl;
     volVectorField U
     (
