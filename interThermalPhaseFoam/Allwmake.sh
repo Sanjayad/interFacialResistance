@@ -7,5 +7,5 @@ cd Libraries
 source Allwmake.sh
 cd ../utilities
 wmake interThermalPhaseChangeFoam_Cond
-wmake interThermalPhaseChangeFoam_Smoothing
+#wmake interThermalPhaseChangeFoam_Smoothing
 cd ..
