@@ -150,6 +150,10 @@ Foam::twoPhaseThermalMixture::twoPhaseThermalMixture
 	cp1_( subDict(phase1Name_).lookup("cp") ),
 	cp2_( subDict(phase2Name_).lookup("cp") ),
 
+	//Get the kinematic viscosity from the dictionary
+	nu1_( subDict(phase1Name_).lookup("nu") ),
+	nu2_( subDict(phase2Name_).lookup("nu") ),
+
 	//Get the conductivity from the dictionary
 	lambda1_( subDict(phase1Name_).lookup("lambda") ),
 	lambda2_( subDict(phase2Name_).lookup("lambda") ),

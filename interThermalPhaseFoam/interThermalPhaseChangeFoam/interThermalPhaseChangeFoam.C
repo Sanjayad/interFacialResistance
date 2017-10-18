@@ -95,8 +95,8 @@ int main(int argc, char *argv[])
 		//Update turbulence and two phase properties
         twoPhaseProperties.correct();
 
-        //Update fields for Kistler model
-        muEffKistler = twoPhaseProperties.mu() + rho*turbulence->nut();
+        //Update fields for Kistler model - There is no need to update it since it is only for liquid
+        //muEffDynamic = twoPhaseProperties.mu() + rho*turbulence->nut();
 
 	//Solve for alpha1
         #include "alphaEqnSubCycle.H"

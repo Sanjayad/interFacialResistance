@@ -23,27 +23,26 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    dynamicKistlerAlphaContactAngleFvPatchScalarField
+    dynamicYokoiAlphaContactAngleFvPatchScalarField
 
 Description
-    Evaluation of the dynamic contact angle using the Hoffman function,
-    based on Kistler (1993)
+    Numerical Studies of the Influence of the Dynamic Contact Angle on a Droplet Impacting on a Dry Surface (2009)
 
 SourceFiles
-    dynamicKistlerAlphaContactAngleFvPatchScalarField.C
+    dynamicYokoiAlphaContactAngleFvPatchScalarField.C
 
 Author
-    Edin Berberovic 2008 - Updated by Alexander Rattner, 2012
+    Sanjay Adhikari 2017
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef dynamicKistlerAlphaContactAngleFvPatchScalarField_H
-#define dynamicKistlerAlphaContactAngleFvPatchScalarField_H
+#ifndef dynamicYokoiAlphaContactAngleFvPatchScalarField_H
+#define dynamicYokoiAlphaContactAngleFvPatchScalarField_H
 
 #include "alphaContactAngleFvPatchScalarField.H"
 #include "mathematicalConstants.H"
 #include "surfaceFields.H"
-#include "RiddersRoot.H"
+#include <math.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -54,7 +53,7 @@ namespace Foam
                            Class dynamicAlphaContactAngleFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
-class dynamicKistlerAlphaContactAngleFvPatchScalarField
+class dynamicYokoiAlphaContactAngleFvPatchScalarField
 :
     public alphaContactAngleFvPatchScalarField
 {
@@ -65,72 +64,47 @@ class dynamicKistlerAlphaContactAngleFvPatchScalarField
 
         //- Limiting receeding contact angle
         scalar thetaR_;
+            
+		//- Equilibrium contact angle (advancing or receding), as parameter
+        scalar thetaE_;
+		
+		//- Surface constant for advancing contact angle
+		scalar ka_;
+		
+		//- Surface constant for receding contact angle
+		scalar kr_;
 
-        //eb Name of the dynamic viscosity field
+        //- Name of the dynamic viscosity field
         word muName_;
 
-        //eb Name of the surface tension
-        word sigmaName_;
-
-public:
-
-    //eb - Function object class, inverse of the Hoffman function
-    class InverseHoffmanFunction : public FuncBase
-    {
-
-        // Private data
-
-            //- Equilibrium contact angle (advancing or receding), as parameter
-            scalar thetaE_;
-
-    public:
-
-        // Constructors
-
-            //- Construct from data
-            InverseHoffmanFunction(const scalar& thetaE)
-            :
-                thetaE_(thetaE)
-            {}
-
-        // operator()
-            scalar operator()(scalar fHI) const
-            {
-                return
-                  pow(fHI,0.706)
-                - pow((1+1.31*pow(fHI,0.99)),0.706)*(1.0/5.16)*atanh((1-cos(thetaE_))/2);
-            }
-    };
-
+        //- Name of the surface tension
+        word sigmaName_;		
 
 
 public:
 
     //- Runtime type information
-    TypeName("dynamicKistlerAlphaContactAngle");
+    TypeName("dynamicYokoiAlphaContactAngle");
 
     // Static data members
 
-        //eb - Conversion factor for radians into degrees
-        static const scalar convertToDeg;
+        //- Conversion factor for radians into degrees
+        //static const scalar convertToDeg;
 
-        //eb - Conversion factor for degrees into radians
-        static const scalar convertToRad;
-
-        //eb - Contact angle corresponding to zero contact line velocity
-        static const scalar theta0;
+        //- Conversion factor for degrees into radians
+        //static const scalar convertToRad;
 
     // Constructors
 
         //- Construct from patch and internal field
-        dynamicKistlerAlphaContactAngleFvPatchScalarField
+        dynamicYokoiAlphaContactAngleFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        dynamicKistlerAlphaContactAngleFvPatchScalarField
+        dynamicYokoiAlphaContactAngleFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
@@ -138,20 +112,20 @@ public:
         );
 
         //- Construct by mapping given
-        //  dynamicKistlerAlphaContactAngleFvPatchScalarField
+        //  dynamicYokoiAlphaContactAngleFvPatchScalarField
         //  onto a new patch
-        dynamicKistlerAlphaContactAngleFvPatchScalarField
+        dynamicYokoiAlphaContactAngleFvPatchScalarField
         (
-            const dynamicKistlerAlphaContactAngleFvPatchScalarField&,
+            const dynamicYokoiAlphaContactAngleFvPatchScalarField&,
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        dynamicKistlerAlphaContactAngleFvPatchScalarField
+        dynamicYokoiAlphaContactAngleFvPatchScalarField
         (
-            const dynamicKistlerAlphaContactAngleFvPatchScalarField&
+            const dynamicYokoiAlphaContactAngleFvPatchScalarField&
         );
 
         //- Construct and return a clone
@@ -159,14 +133,14 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new dynamicKistlerAlphaContactAngleFvPatchScalarField(*this)
+                new dynamicYokoiAlphaContactAngleFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        dynamicKistlerAlphaContactAngleFvPatchScalarField
+        dynamicYokoiAlphaContactAngleFvPatchScalarField
         (
-            const dynamicKistlerAlphaContactAngleFvPatchScalarField&,
+            const dynamicYokoiAlphaContactAngleFvPatchScalarField&,
             const DimensionedField<scalar, volMesh>&
         );
 
@@ -178,7 +152,7 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new dynamicKistlerAlphaContactAngleFvPatchScalarField(*this, iF)
+                new dynamicYokoiAlphaContactAngleFvPatchScalarField(*this, iF)
             );
         }
 
@@ -190,12 +164,6 @@ public:
         (
             const fvPatchVectorField& Up,
             const fvsPatchVectorField& nHat
-        ) const;
-
-        //eb - Evaluate the value of the Hoffman function
-        scalar HoffmanFunction
-        (
-            const scalar& x
         ) const;
 
         //- Write

@@ -78,6 +78,10 @@ protected:
 	dimensionedScalar cp2_;
 
 	//Added by Sanjay
+	dimensionedScalar nu1_;
+	dimensionedScalar nu2_;
+
+	//Added by Sanjay
 	dimensionedScalar lambda1_;
 	dimensionedScalar lambda2_;
 
@@ -188,6 +192,18 @@ public:
         const dimensionedScalar& cp2() const
         {
             return cp2_;
+        };
+
+        //- Return const-access to phase1 kinematic viscosity
+        const dimensionedScalar& nu1() const
+        {
+            return nu1_;
+        }
+
+        //- Return const-access to phase2 kinematic viscosity
+        const dimensionedScalar& nu2() const
+        {            
+			return nu2_;
         };
 
         //- Return const-access to phase1 conductivity

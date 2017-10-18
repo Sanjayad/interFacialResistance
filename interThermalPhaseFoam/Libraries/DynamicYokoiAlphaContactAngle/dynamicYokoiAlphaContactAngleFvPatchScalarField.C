@@ -24,7 +24,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "dynamicKistlerAlphaContactAngleFvPatchScalarField.H"
+#include "dynamicYokoiAlphaContactAngleFvPatchScalarField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "fvPatchFieldMapper.H"
 #include "fvPatchFields.H"
@@ -37,18 +37,18 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * //
 
-const scalar dynamicKistlerAlphaContactAngleFvPatchScalarField::convertToDeg =
-             180.0/constant::mathematical::pi;
+//const scalar dynamicYokoiAlphaContactAngleFvPatchScalarField::convertToDeg =
+  //           180.0/constant::mathematical::pi;
 
-const scalar dynamicKistlerAlphaContactAngleFvPatchScalarField::convertToRad =
-             constant::mathematical::pi/180.0;
+//const scalar dynamicYokoiAlphaContactAngleFvPatchScalarField::convertToRad =
+  //           constant::mathematical::pi/180.0;
 
-const scalar dynamicKistlerAlphaContactAngleFvPatchScalarField::theta0 = 70.0;
+//const scalar dynamicYokoiAlphaContactAngleFvPatchScalarField::theta0 = 70.0;
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-dynamicKistlerAlphaContactAngleFvPatchScalarField::
-dynamicKistlerAlphaContactAngleFvPatchScalarField
+dynamicYokoiAlphaContactAngleFvPatchScalarField::
+dynamicYokoiAlphaContactAngleFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -57,14 +57,17 @@ dynamicKistlerAlphaContactAngleFvPatchScalarField
     alphaContactAngleFvPatchScalarField(p, iF),
     thetaA_(0.0),
     thetaR_(0.0),
+	thetaE_(0.0),
+	ka_(1.0), //- To avoid division by zero
+	kr_(1.0),
     muName_("undefined"),
     sigmaName_("undefined")
 {}
 
-dynamicKistlerAlphaContactAngleFvPatchScalarField::
-dynamicKistlerAlphaContactAngleFvPatchScalarField
+dynamicYokoiAlphaContactAngleFvPatchScalarField::
+dynamicYokoiAlphaContactAngleFvPatchScalarField
 (
-    const dynamicKistlerAlphaContactAngleFvPatchScalarField& acpsf,
+    const dynamicYokoiAlphaContactAngleFvPatchScalarField& acpsf,
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
     const fvPatchFieldMapper& mapper
@@ -73,13 +76,16 @@ dynamicKistlerAlphaContactAngleFvPatchScalarField
     alphaContactAngleFvPatchScalarField(acpsf, p, iF, mapper),
     thetaA_(acpsf.thetaA_),
     thetaR_(acpsf.thetaR_),
+	thetaE_(acpsf.thetaE_),
+	ka_(acpsf.ka_),
+	kr_(acpsf.kr_),
     muName_(acpsf.muName_),
     sigmaName_(acpsf.sigmaName_)
 {}
 
 
-dynamicKistlerAlphaContactAngleFvPatchScalarField::
-dynamicKistlerAlphaContactAngleFvPatchScalarField
+dynamicYokoiAlphaContactAngleFvPatchScalarField::
+dynamicYokoiAlphaContactAngleFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -89,37 +95,46 @@ dynamicKistlerAlphaContactAngleFvPatchScalarField
     alphaContactAngleFvPatchScalarField(p, iF),
     thetaA_(readScalar(dict.lookup("thetaA"))),
     thetaR_(readScalar(dict.lookup("thetaR"))),
-    muName_(dict.lookup("muEffKistler")),
-    sigmaName_(dict.lookup("sigmaKistler"))
+	thetaE_(readScalar(dict.lookup("thetaE"))),
+	ka_(readScalar(dict.lookup("ka"))),
+	kr_(readScalar(dict.lookup("kr"))),
+    muName_(dict.lookup("muEffYokoi")),
+    sigmaName_(dict.lookup("sigmaYokoi"))
 {
     evaluate();
 }
 
 
-dynamicKistlerAlphaContactAngleFvPatchScalarField::
-dynamicKistlerAlphaContactAngleFvPatchScalarField
+dynamicYokoiAlphaContactAngleFvPatchScalarField::
+dynamicYokoiAlphaContactAngleFvPatchScalarField
 (
-    const dynamicKistlerAlphaContactAngleFvPatchScalarField& acpsf
+    const dynamicYokoiAlphaContactAngleFvPatchScalarField& acpsf
 )
 :
     alphaContactAngleFvPatchScalarField(acpsf),
     thetaA_(acpsf.thetaA_),
     thetaR_(acpsf.thetaR_),
+	thetaE_(acpsf.thetaE_),
+	ka_(acpsf.ka_),
+	kr_(acpsf.kr_),
     muName_(acpsf.muName_),
     sigmaName_(acpsf.sigmaName_)
 {}
 
 
-dynamicKistlerAlphaContactAngleFvPatchScalarField::
-dynamicKistlerAlphaContactAngleFvPatchScalarField
+dynamicYokoiAlphaContactAngleFvPatchScalarField::
+dynamicYokoiAlphaContactAngleFvPatchScalarField
 (
-    const dynamicKistlerAlphaContactAngleFvPatchScalarField& acpsf,
+    const dynamicYokoiAlphaContactAngleFvPatchScalarField& acpsf,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
     alphaContactAngleFvPatchScalarField(acpsf, iF),
     thetaA_(acpsf.thetaA_),
     thetaR_(acpsf.thetaR_),
+	thetaE_(acpsf.thetaE_),
+	ka_(acpsf.ka_),
+	kr_(acpsf.kr_),
     muName_(acpsf.muName_),
     sigmaName_(acpsf.sigmaName_)
 {}
@@ -127,23 +142,24 @@ dynamicKistlerAlphaContactAngleFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<scalarField> dynamicKistlerAlphaContactAngleFvPatchScalarField::theta
+tmp<scalarField> dynamicYokoiAlphaContactAngleFvPatchScalarField::theta
 (
     const fvPatchVectorField& Up,
     const fvsPatchVectorField& nHat
 ) const
 {
-    //eb - Lookup and return the patchField of dynamic viscosity of mixture
+    
+	//- Lookup and return the patchField of dynamic viscosity of mixture
     //     and surface tension
-    if((muName_ != "muEffKistler") || (sigmaName_ != "sigmaKistler"))
+    if((muName_ != "muDynamic") || (sigmaName_ != "sigmaDynamic"))
     {
         FatalErrorIn
         (
-            "dynamicKistlerAlphaContactAngleFvPatchScalarField"
-        )   << " muEffKistler or sigma set inconsitently, muEffKistler = " << muName_
-            << ", sigmaKistler = " << sigmaName_ << '.' << nl
-            << "    Set both muEffKistler and sigmaKistler according to the "
-           "definition of dynamicKistlerAlphaContactAngle"
+            "dynamicYokoiAlphaContactAngleFvPatchScalarField"
+        )   << " muEffYokoi or sigmaYokoi set inconsitently, muEffYokoi = " << muName_
+            << ", sigmaYokoi = " << sigmaName_ << '.' << nl
+            << "    Set both muEffYokoi and sigmaYokoi according to the "
+           "definition of dynamicYokoiAlphaContactAngle"
             << "\n    on patch " << this->patch().name()
             << " of field " << this->dimensionedInternalField().name()
             << " in file " << this->dimensionedInternalField().objectPath()
@@ -162,8 +178,10 @@ tmp<scalarField> dynamicKistlerAlphaContactAngleFvPatchScalarField::theta
     vectorField nf = patch().nf();
 
     // Calculate the component of the velocity parallel to the wall
-    vectorField Uwall = Up.patchInternalField();// - Up; (-Up doesn't work for the slip boundary condition as there is velocity on the patch)
-    Uwall -= (nf & Uwall)*nf;
+    vectorField Uwall = Up.patchInternalField() - Up; 
+	//- Up.patchInternalField() - Up doesn't work for the total slip boundary condition as the velocity on the patch equals the internal field velocity
+    
+	Uwall -= (nf & Uwall)*nf;
 
     // Find the direction of the interface parallel to the wall
     vectorField nWall = nHat - (nf & nHat)*nf;
@@ -175,53 +193,33 @@ tmp<scalarField> dynamicKistlerAlphaContactAngleFvPatchScalarField::theta
     // the wall
     scalarField uwall = nWall & Uwall;
 
-    //eb - Calculate local Capillary number
-    //scalarField Ca = mup*mag(uwall)/sigmap;
-    scalarField Ca = mup*uwall/sigmap;
-//change 0917417 (Use the signed magnitude of velocity insted of the magnitude of velocity)
-//Info << "Mu" << tab << "=" << tab << mup << endl;
-//Info << "Sigma" << tab << "=" << tab << sigmap << endl; 
-
-    //eb - Instantiate function object InverseHoffmanFunction for thetaA and thetaR
-    dynamicKistlerAlphaContactAngleFvPatchScalarField::InverseHoffmanFunction InvHoffFuncThetaA
-    (
-        convertToRad*thetaA_
-//        thetaA_
-    );
-
-    dynamicKistlerAlphaContactAngleFvPatchScalarField::InverseHoffmanFunction InvHoffFuncThetaR
-    (
-        convertToRad*thetaR_
-//        thetaR_
-    );
-
-    //eb - Calculate InverseHoffmanFunction for thetaA and thetaR using RiddersRoot
-    RiddersRoot RRInvHoffFuncThetaA(InvHoffFuncThetaA, 1.e-10);
-    scalar InvHoffFuncThetaAroot = RRInvHoffFuncThetaA.root(0,65);
-
-    RiddersRoot RRInvHoffFuncThetaR(InvHoffFuncThetaR, 1.e-10);
-    scalar InvHoffFuncThetaRroot = RRInvHoffFuncThetaR.root(0,65);
-
-    //eb - Calculate and return the value of contact angle on patch faces,
+    //- Calculate local Capillary number
+    scalarField Ca = mup*mag(uwall)/sigmap;
+    //-    Calculate and return the value of contact angle on patch faces,
     //     a general approach: the product of Uwall and nWall is negative
     //     for advancing and positiv for receding motion.
-    //     thetaDp is initialized to theta0 degrees corresponding to no wall adhesion
-    scalarField thetaDp(patch().size(), convertToRad*theta0);
-//Info << "Up " << tab  << "1" << tab << "="<< tab << Up << endl;
-//Info << "thetaRroot " << tab  << "2="<< tab << InvHoffFuncThetaRroot << endl;
-    forAll(uwall, pfacei)
-    {
-        if(uwall[pfacei] < 0.0)
-        {
-            thetaDp[pfacei] = min ( 4.0, max( 0.00001, HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaAroot) ) );
-        }
-        else if (uwall[pfacei] > 0.0)
-        {
-            thetaDp[pfacei] = min ( 4.0, max( 0.00001, HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaRroot) ) );
-        }
-    }
-//forAll(uwall,pfacei)
-//	Info << "Up " << tab  << "1" << tab << "="<< tab << Up[pfacei] << endl;
+    //     thetaDp is initialized to thetaE degrees corresponding to no wall adhesion
+//	scalarField thetaDp(patch().size(), convertToRad*thetaE_);
+	scalarField thetaDp(patch().size(), thetaE_);
+	forAll(uwall, pfacei)
+	{
+	    if(uwall[pfacei] < 0.0)
+	    {
+//		        thetaDp[pfacei] = min ( thetaA_*convertToRad, thetaE_*convertToRad + pow( Ca[pfacei]/ka_, 1.0/3.0 ) );
+//	        thetaDp[pfacei] = min ( thetaA_, thetaE_ + pow( Ca[pfacei]/ka_, 1.0/3.0 ) );
+	        thetaDp[pfacei] = min ( thetaA_, thetaE_ + cbrt( Ca[pfacei]/ka_ ) );
+	    }
+	    else if (uwall[pfacei] > 0.0)
+	    {
+//		        thetaDp[pfacei] = max ( thetaR_*convertToRad, thetaE_*convertToRad - pow( Ca[pfacei]/ka_, 1.0/3.0 ) );
+//	        thetaDp[pfacei] = max ( thetaR_, thetaE_ + pow( -Ca[pfacei]/ka_, 1.0/3.0 ) );
+	        thetaDp[pfacei] = max ( thetaR_, thetaE_ + cbrt( -Ca[pfacei]/kr_ ) );
+	    }
+	}
+
+	forAll(uwall, pfacei){		
+		Info <<  uwall[pfacei] << tab << thetaDp[pfacei] << endl;
+	}
 /*
 //////////////////// eb - Print out some data ////////////////////////
     Info << "pfacei: " << tab  << "nf: "<< tab << "Uwall: " << tab
@@ -237,34 +235,27 @@ tmp<scalarField> dynamicKistlerAlphaContactAngleFvPatchScalarField::theta
     }
 //////////////////////////////////////////////////////////////////////
 */
-    return convertToDeg*thetaDp;
-//    return thetaDp;
+//	return convertToDeg*thetaDp;
+	return 1.0*thetaDp;
 }
 
-
-scalar dynamicKistlerAlphaContactAngleFvPatchScalarField::HoffmanFunction
-(
-    const scalar& x
-) const
-{
-    return acos(1 - 2*tanh(5.16*pow(x/(1+1.31*pow(x,0.99)),0.706)));
-}
-
-
-void dynamicKistlerAlphaContactAngleFvPatchScalarField::write(Ostream& os) const
+void dynamicYokoiAlphaContactAngleFvPatchScalarField::write(Ostream& os) const
 {
     fvPatchScalarField::write(os);
     os.writeKeyword("thetaA") << thetaA_ << token::END_STATEMENT << nl;
     os.writeKeyword("thetaR") << thetaR_ << token::END_STATEMENT << nl;
-    os.writeKeyword("muEffKistler") << muName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("sigmaKistler") << sigmaName_ << token::END_STATEMENT << nl;
+    os.writeKeyword("thetaE") << thetaE_ << token::END_STATEMENT << nl;
+    os.writeKeyword("ka") << ka_ << token::END_STATEMENT << nl;
+    os.writeKeyword("kr") << kr_ << token::END_STATEMENT << nl;
+    os.writeKeyword("muEffYokoi") << muName_ << token::END_STATEMENT << nl;
+    os.writeKeyword("sigmaYokoi") << sigmaName_ << token::END_STATEMENT << nl;
     writeEntry("value", os);
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchScalarField, dynamicKistlerAlphaContactAngleFvPatchScalarField);
+makePatchTypeField(fvPatchScalarField, dynamicYokoiAlphaContactAngleFvPatchScalarField);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

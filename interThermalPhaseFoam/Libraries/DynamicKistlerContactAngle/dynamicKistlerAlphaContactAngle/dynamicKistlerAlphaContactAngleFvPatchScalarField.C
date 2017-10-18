@@ -135,7 +135,7 @@ tmp<scalarField> dynamicKistlerAlphaContactAngleFvPatchScalarField::theta
 {
     //eb - Lookup and return the patchField of dynamic viscosity of mixture
     //     and surface tension
-    if((muName_ != "muEffKistler") || (sigmaName_ != "sigmaKistler"))
+    if((muName_ != "muDynamic") || (sigmaName_ != "sigmaDynamic"))
     {
         FatalErrorIn
         (
@@ -162,7 +162,7 @@ tmp<scalarField> dynamicKistlerAlphaContactAngleFvPatchScalarField::theta
     vectorField nf = patch().nf();
 
     // Calculate the component of the velocity parallel to the wall
-    vectorField Uwall = Up.patchInternalField();// - Up; (-Up doesn't work for the slip boundary condition as there is velocity on the patch)
+    vectorField Uwall = Up.patchInternalField() - Up; //(-Up doesn't work for the slip boundary condition as there is velocity on the patch)
     Uwall -= (nf & Uwall)*nf;
 
     // Find the direction of the interface parallel to the wall
@@ -174,6 +174,8 @@ tmp<scalarField> dynamicKistlerAlphaContactAngleFvPatchScalarField::theta
     // Calculate Uwall resolved normal to the interface parallel to
     // the wall
     scalarField uwall = nWall & Uwall;
+	// Keep the uwall bounded
+	//uwall = min(200.0,max(-200.0,uwall));
 
     //eb - Calculate local Capillary number
     //scalarField Ca = mup*mag(uwall)/sigmap;
@@ -195,12 +197,14 @@ tmp<scalarField> dynamicKistlerAlphaContactAngleFvPatchScalarField::theta
 //        thetaR_
     );
 
+Info << "start" << endl;
     //eb - Calculate InverseHoffmanFunction for thetaA and thetaR using RiddersRoot
     RiddersRoot RRInvHoffFuncThetaA(InvHoffFuncThetaA, 1.e-10);
     scalar InvHoffFuncThetaAroot = RRInvHoffFuncThetaA.root(0,65);
-
+Info << "stop1" << endl;
     RiddersRoot RRInvHoffFuncThetaR(InvHoffFuncThetaR, 1.e-10);
     scalar InvHoffFuncThetaRroot = RRInvHoffFuncThetaR.root(0,65);
+Info << "stop2" << endl;
 
     //eb - Calculate and return the value of contact angle on patch faces,
     //     a general approach: the product of Uwall and nWall is negative
@@ -209,19 +213,22 @@ tmp<scalarField> dynamicKistlerAlphaContactAngleFvPatchScalarField::theta
     scalarField thetaDp(patch().size(), convertToRad*theta0);
 //Info << "Up " << tab  << "1" << tab << "="<< tab << Up << endl;
 //Info << "thetaRroot " << tab  << "2="<< tab << InvHoffFuncThetaRroot << endl;
-    forAll(uwall, pfacei)
+//forAll(uwall,pfacei)
+	//Info << "uwall " << tab  << pfacei << tab << "="<< tab << uwall[pfacei] << endl;
+    
+forAll(uwall, pfacei)
     {
         if(uwall[pfacei] < 0.0)
         {
             thetaDp[pfacei] = min ( 4.0, max( 0.00001, HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaAroot) ) );
+Info << "Hoffman " << tab  << pfacei << tab << "="<< tab << HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaAroot) << endl;
         }
         else if (uwall[pfacei] > 0.0)
         {
             thetaDp[pfacei] = min ( 4.0, max( 0.00001, HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaRroot) ) );
+Info << "Hoffman " << tab  << pfacei << tab << "="<< tab << HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaRroot) << endl;
         }
     }
-//forAll(uwall,pfacei)
-//	Info << "Up " << tab  << "1" << tab << "="<< tab << Up[pfacei] << endl;
 /*
 //////////////////// eb - Print out some data ////////////////////////
     Info << "pfacei: " << tab  << "nf: "<< tab << "Uwall: " << tab
