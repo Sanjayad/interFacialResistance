@@ -95,6 +95,7 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
     const dimensionedScalar& rho2 = twoPhaseProperties.rho2();
     const dimensionedScalar& cp1 = twoPhaseProperties.cp1();
     const dimensionedScalar& cp2 = twoPhaseProperties.cp2();
+    const dimensionedScalar& mu1 = twoPhaseProperties.nu1() * rho1; 
     const dimensionedScalar& lambda1 = twoPhaseProperties.lambda1();
     const dimensionedScalar& lambda2 = twoPhaseProperties.lambda2();
 
@@ -153,20 +154,7 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
         incompressible::turbulenceModel::New(U, phi, twoPhaseProperties)
     );
 
-    //The following two fields supports the Kistler contact angle model
-    volScalarField muEffKistler
-    (
-        IOobject
-        (
-            "muEffKistler",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        twoPhaseProperties.mu() + rho*turbulence->nut()
-    );
-
+    //The following two fields supports the Dynamic contact angle models
     IOdictionary transportProperties
     (
         IOobject
@@ -177,15 +165,29 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
             IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE
         )
+    );    
+	
+    volScalarField muDynamic
+    (
+        IOobject
+        (
+            "muDynamic",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+		mesh,		
+		mu1
     );
 
-    //Kistler contact angle model needs the sigma vol scalar field to be in the objectRegistry
-    // - even though sigma is already in the interface object below
+    //- Dynamic contact angle models needs the sigma vol scalar field to be in the objectRegistry
+    //- even though sigma is already in the interface object below
     volScalarField sigma
     (
         IOobject
         (
-            "sigmaKistler",
+            "sigmaDynamic",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,

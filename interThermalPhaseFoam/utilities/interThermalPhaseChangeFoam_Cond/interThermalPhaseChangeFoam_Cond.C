@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
         twoPhaseProperties.correct();
 
         //Update fields for Kistler model
-        muEffKistler = twoPhaseProperties.mu() + rho*turbulence->nut();
+        //muEffKistler = twoPhaseProperties.mu() + rho*turbulence->nut();
 
         //For now, the energy equation is only 1-way coupled with the momentum/pressure equations,
         //so it can be solved explicitly, and separately here
