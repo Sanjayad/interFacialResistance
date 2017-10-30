@@ -217,9 +217,6 @@ tmp<scalarField> dynamicYokoiAlphaContactAngleFvPatchScalarField::theta
 	    }
 	}
 
-	forAll(uwall, pfacei){		
-		Info <<  uwall[pfacei] << tab << thetaDp[pfacei] << endl;
-	}
 /*
 //////////////////// eb - Print out some data ////////////////////////
     Info << "pfacei: " << tab  << "nf: "<< tab << "Uwall: " << tab
