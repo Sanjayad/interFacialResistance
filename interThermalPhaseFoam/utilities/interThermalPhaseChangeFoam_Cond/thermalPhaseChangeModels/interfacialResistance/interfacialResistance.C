@@ -242,7 +242,7 @@ Info << "dtUtilizedByTheThermalPhaseChangeModel = " << dT.value() << endl;
 	//limited phase change heat
 	T_sp_coeff_.internalField() = hi*interfaceArea/mesh_.V();
 	T_sc_coeff_.internalField() = -hi*interfaceArea*T_sat_/mesh_.V();
-	//Q_pc_.internalField() = hi*interfaceArea*(T_-T_sat_)/mesh_.V(); 
+	Q_pc_.internalField() = hi*interfaceArea*(T_-T_sat_)/mesh_.V(); 
 	forAll(mesh_.cells(),pI)
 	{
 		threshold_[pI] = ( (alpha1_[pI] >= 0.00) && (alpha1_[pI] <= 1.00) ) ? 1.0 : 0.0; 
@@ -250,7 +250,7 @@ Info << "dtUtilizedByTheThermalPhaseChangeModel = " << dT.value() << endl;
 	
 
 	//decaying Phase Change Heat per unit volume
-	Q_pc_.internalField() = threshold_*twoPhaseProperties_.rho()*twoPhaseProperties_.cp()*((1.0-exp(-hi*interfaceArea*dT.value()/(mesh_.V()*twoPhaseProperties_.rho()*twoPhaseProperties_.cp())))*(T_-T_sat_)/dT.value());
+	//Q_pc_.internalField() = threshold_*twoPhaseProperties_.rho()*twoPhaseProperties_.cp()*((1.0-exp(-hi*interfaceArea*dT.value()/(mesh_.V()*twoPhaseProperties_.rho()*twoPhaseProperties_.cp())))*(T_-T_sat_)/dT.value());
 	//Q_pc_.internalField() = twoPhaseProperties_.rho()*twoPhaseProperties_.cp()*((1.0-exp(-hi*interfaceArea*dT.value()/(mesh_.V()*twoPhaseProperties_.rho()*twoPhaseProperties_.cp())))*(T_-T_sat_)/dT.value());
 
 	//Unlimited phase change heat

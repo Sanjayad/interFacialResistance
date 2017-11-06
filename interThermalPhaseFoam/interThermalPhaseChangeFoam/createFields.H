@@ -205,8 +205,8 @@ const scalar CHSP = CombinedHSPressure ? 1.0 : 0;
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-		mesh,		
-		mu1
+	mesh,		
+	mu1
     );
 
     //- Dynamic contact angle models needs the sigma vol scalar field to be in the objectRegistry
