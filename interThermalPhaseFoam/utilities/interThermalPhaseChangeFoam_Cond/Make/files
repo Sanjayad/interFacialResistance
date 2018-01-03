@@ -10,6 +10,7 @@ thermalPhaseChangeModels/HiLoNoPCV/HiLoNoPCV.C
 thermalPhaseChangeModels/HiLoNoPCVAlpha1/HiLoNoPCVAlpha1.C
 thermalPhaseChangeModels/Yang/Yang.C
 thermalPhaseChangeModels/interfacialResistance/interfacialResistance.C
+thermalPhaseChangeModels/interfacialResistance_SGS/interfacialResistance_SGS.C
 
 
 EXE = $(FOAM_USER_APPBIN)/interThermalPhaseChangeFoam_Cond
