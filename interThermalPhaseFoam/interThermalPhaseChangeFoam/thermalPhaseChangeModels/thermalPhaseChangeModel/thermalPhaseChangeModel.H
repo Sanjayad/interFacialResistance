@@ -148,6 +148,7 @@ public:
 		//  rate per unit volume due to phase change. Evaporation is positive, and
 		//  condensation is negative, units (W/m^3)
 		virtual tmp<volScalarField> Q_pc() const = 0;
+		virtual tmp<volScalarField> Q_pc_sgs() const;
 		
 		//- Return the proportional source term coefficient for phase change heat transfer
 		// rate in the energy equation 

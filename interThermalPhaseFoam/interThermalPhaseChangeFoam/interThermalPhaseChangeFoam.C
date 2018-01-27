@@ -125,6 +125,7 @@ int main(int argc, char *argv[])
 	Info<< "****Pressure range: " << gMax(p) - gMin(p) << " Pa" << endl;
 	Info<< "****Max velocity: " << gMax( mag(U.internalField()) ) << " m/s" << endl;
 	Info<< "****Phase change energy: " << gSum( phaseChangeModel->Q_pc() * mesh.V() ) << " W" << endl;
+	Info<< "****Subgrid scale Phase change energy: " << gSum( phaseChangeModel->Q_pc_sgs() * mesh.V() ) << " W" << endl;		
 	Info<< "****Volume change: " << gSum( phaseChangeModel->PCV() * mesh.V() ) << " m^3/s" << endl;
 
         //For now, the energy equation is only 1-way coupled with the momentum/pressure equations,

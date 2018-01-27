@@ -198,7 +198,9 @@ Foam::thermalPhaseChangeModels::interfacialResistance_SGS::interfacialResistance
 	R_g( thermalPhaseChangeProperties_.lookup("R_g") ),
 	sigmaHat( thermalPhaseChangeProperties_.lookup("sigmaHat") ),
 	v_lv( (32.0/twoPhaseProperties_.rho2().value()) - (1.0/twoPhaseProperties_.rho1().value()) ),
-	hi( (2.0*sigmaHat.value()/(2.0-sigmaHat.value())) * (h_lv_.value()*h_lv_.value()/(T_sat_.value()*v_lv)) * pow(1.0/(2.0*3.1416*R_g.value()*T_sat_.value()),0.5) )
+	hi( (2.0*sigmaHat.value()/(2.0-sigmaHat.value())) * (h_lv_.value()*h_lv_.value()/(T_sat_.value()*v_lv)) * pow(1.0/(2.0*3.1416*R_g.value()*T_sat_.value()),0.5) ),
+	C_1 ( 8.379E5 ),
+	C_2 ( -0.2356 )
 
 {
 	//Read in the cond/evap int. thresholds
@@ -325,11 +327,11 @@ Info << "dtUtilizedByTheThermalPhaseChangeModel = " << dT.value() << endl;
 				if(faceTimePatch[fI] <= 0.0)
 				{
 
-					qFlux_sgsPatch[fI] = -(1.0-wetPatch[fI])*C_1*pow(SMALL,C_2);  // It's actually heat transfer coefficient
+					qFlux_sgsPatch[fI] = (1.0-wetPatch[fI])*C_1*pow(SMALL,C_2);  // It's actually heat transfer coefficient
 				}
 				else
 				{
-					qFlux_sgsPatch[fI] = -(1.0-wetPatch[fI])*C_1*pow(faceTimePatch[fI],C_2);
+					qFlux_sgsPatch[fI] = (1.0-wetPatch[fI])*C_1*pow(faceTimePatch[fI],C_2);
 				}			
 			}
 //Info << "patch time = " << faceTimePatch;

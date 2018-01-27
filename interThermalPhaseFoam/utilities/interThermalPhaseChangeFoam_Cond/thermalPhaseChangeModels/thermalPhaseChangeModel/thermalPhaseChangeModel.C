@@ -99,6 +99,25 @@ Foam::tmp<Foam::volScalarField> Foam::thermalPhaseChangeModel::PCV() const
 	}
 }
 
+Foam::tmp<Foam::volScalarField> Foam::thermalPhaseChangeModel::Q_pc_sgs() const
+{
+	return tmp<volScalarField>
+	(
+		new volScalarField
+		(			
+			IOobject
+			(
+				"sgsPhaseChangeHeat",
+				T_.time().timeName(),
+				T_.mesh(),
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			T_.mesh(),
+			dimensionedScalar( "dummy", dimensionSet(1,-1,-3,0,0,0,0), 0 )
+		)
+	);
+}
 
 Foam::tmp<Foam::volScalarField> Foam::thermalPhaseChangeModel::T_sp_coeff() const
 {

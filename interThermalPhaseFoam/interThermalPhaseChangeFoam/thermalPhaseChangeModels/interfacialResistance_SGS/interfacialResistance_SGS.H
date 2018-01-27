@@ -116,8 +116,8 @@ class interfacialResistance_SGS
 	double hi;							// interfacial resistance
 
 	// some constants for the fitted function of heat flux 
-	double C_1 = 8.379E5;				// All these could be later read from a file
-	double C_2 = -0.2356;	 
+	double C_1;				// All these could be later read from a file
+	double C_2; 
 	
 
 public:
@@ -151,7 +151,10 @@ public:
 		{
 			return Q_pc_;
 		}
-
+		tmp<volScalarField> Q_pc_sgs() const
+		{
+			return Q_pc_sgs_;
+		}
 		tmp<volScalarField> T_sp_coeff() const
 		{
 			return T_sp_coeff_;

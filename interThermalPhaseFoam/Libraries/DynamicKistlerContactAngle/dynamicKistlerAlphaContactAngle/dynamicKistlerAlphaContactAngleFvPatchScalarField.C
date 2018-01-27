@@ -221,12 +221,12 @@ forAll(uwall, pfacei)
         if(uwall[pfacei] < 0.0)
         {
             thetaDp[pfacei] = min ( 4.0, max( 0.00001, HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaAroot) ) );
-Info << "Hoffman " << tab  << pfacei << tab << "="<< tab << HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaAroot) << endl;
+//Info << "Hoffman " << tab  << pfacei << tab << "="<< tab << HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaAroot) << endl;
         }
         else if (uwall[pfacei] > 0.0)
         {
             thetaDp[pfacei] = min ( 4.0, max( 0.00001, HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaRroot) ) );
-Info << "Hoffman " << tab  << pfacei << tab << "="<< tab << HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaRroot) << endl;
+//Info << "Hoffman " << tab  << pfacei << tab << "="<< tab << HoffmanFunction(-Ca[pfacei] + InvHoffFuncThetaRroot) << endl;
         }
     }
 /*
