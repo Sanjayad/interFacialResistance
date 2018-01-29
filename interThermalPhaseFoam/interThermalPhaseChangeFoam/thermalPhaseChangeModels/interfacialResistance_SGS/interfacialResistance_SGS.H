@@ -118,6 +118,9 @@ class interfacialResistance_SGS
 	// some constants for the fitted function of heat flux 
 	double C_1;				// All these could be later read from a file
 	double C_2; 
+
+	// threshold time
+	double C_3;
 	
 
 public:
@@ -164,9 +167,9 @@ public:
 			return T_sc_coeff_;
 		}
 
-
-        //- Correct the thermalPhaseChange model
-        void correct()
+        	
+		//- Correct the thermalPhaseChange model
+        	void correct()
 		{
 			calcQ_pc();
 		}

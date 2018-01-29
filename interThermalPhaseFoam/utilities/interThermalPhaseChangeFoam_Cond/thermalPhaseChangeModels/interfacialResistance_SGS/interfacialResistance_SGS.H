@@ -119,6 +119,8 @@ class interfacialResistance_SGS
 	double C_1;				// All these could be later read from a file
 	double C_2;	 
 	
+	// Threshold time
+	double C_3;
 
 public:
 

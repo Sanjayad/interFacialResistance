@@ -114,7 +114,7 @@ Foam::thermalPhaseChangeModels::interfacialResistance_SGS::interfacialResistance
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar( "dummy", dimensionSet(0,0,1,0,0,0,0), 0 )
+        dimensionedScalar( "dummy", dimensionSet(0,0,1,0,0,0,0), 15E-1 )
     ),
 	T_sp_coeff_
     (
@@ -200,8 +200,8 @@ Foam::thermalPhaseChangeModels::interfacialResistance_SGS::interfacialResistance
 	v_lv( (32.0/twoPhaseProperties_.rho2().value()) - (1.0/twoPhaseProperties_.rho1().value()) ),
 	hi( (2.0*sigmaHat.value()/(2.0-sigmaHat.value())) * (h_lv_.value()*h_lv_.value()/(T_sat_.value()*v_lv)) * pow(1.0/(2.0*3.1416*R_g.value()*T_sat_.value()),0.5) ),
 	C_1 ( 8.379E5 ),
-	C_2 ( -0.2356 )
-
+	C_2 ( -0.2356 ),
+	C_3 ( 15E-1 )
 {
 	//Read in the cond/evap int. thresholds
 	thermalPhaseChangeProperties_.lookup("CondThresh") >> CondThresh;
@@ -211,7 +211,20 @@ Foam::thermalPhaseChangeModels::interfacialResistance_SGS::interfacialResistance
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
+/*
+void Foam::thermalPhaseChangeModels::interfacialResistance_SGS::setFaceTimeValue()
+{
+	forAll(mesh_.boundary(),pI)
+	{
+		if(isA<wallFvPatch>(mesh_.boundary()[pI]))
+		{
+			scalarField& faceTimePatch = faceTime.boundaryField()[pI];
+			faceTimePatch = C_3;
+		}
+	}
+	
+}
+*/
 void Foam::thermalPhaseChangeModels::interfacialResistance_SGS::calcQ_pc()
 {
 //Info << "hi" << tab << hi << endl;
@@ -295,6 +308,7 @@ Info << "dtUtilizedByTheThermalPhaseChangeModel = " << dT.value() << endl;
 	T_sp_coeff_.internalField() = hi*interfaceArea/mesh_.V();
 	T_sc_coeff_.internalField() = -hi*interfaceArea*T_sat_/mesh_.V();
 	Q_pc_.internalField() = hi*interfaceArea*(T_-T_sat_)/mesh_.V(); 
+	Q_pc_sgs_.internalField() = 0.0;
 	forAll(mesh_.cells(),pI)
 	{
 		threshold_[pI] = ( (alpha1_[pI] >= 0.00) && (alpha1_[pI] <= 1.00) ) ? 1.0 : 0.0; 
@@ -323,21 +337,33 @@ Info << "dtUtilizedByTheThermalPhaseChangeModel = " << dT.value() << endl;
 			faceTimePatch = max(SMALL, (1.0-wetPatch)*faceTimePatch);
 			
 			forAll(faceTimePatch, fI)
-			{					
+			{			
+				label wallCellI = mesh_.boundary()[pI].faceCells()[fI];		
 				if(faceTimePatch[fI] <= 0.0)
 				{
 
 					qFlux_sgsPatch[fI] = (1.0-wetPatch[fI])*C_1*pow(SMALL,C_2);  // It's actually heat transfer coefficient
+					Q_pc_sgs_[wallCellI] = (1-alpha1f[wallCellI])*qFlux_sgsPatch[fI]*mag(mesh_.Sf()[fI])*(T_[wallCellI]-T_sat_.value());
+				}
+				else if(faceTimePatch[fI] > 0.0 && faceTimePatch[fI] <= C_3)
+				{
+					qFlux_sgsPatch[fI] = (1.0-wetPatch[fI])*C_1*pow(faceTimePatch[fI],C_2);
+					Q_pc_sgs_[wallCellI] = (1-alpha1f[wallCellI])*qFlux_sgsPatch[fI]*mag(mesh_.Sf()[fI])*(T_[wallCellI]-T_sat_.value());
 				}
 				else
 				{
-					qFlux_sgsPatch[fI] = (1.0-wetPatch[fI])*C_1*pow(faceTimePatch[fI],C_2);
+					qFlux_sgsPatch[fI] = 0.0;
+					Q_pc_sgs_[wallCellI] = 0.0;
 				}			
 			}
-//Info << "patch time = " << faceTimePatch;
+			
+			//Q_pc_sgs_.internalField()[wallCellI] = (1-alpha1f[wallCellI])*qFlux_sgsPatch*mesh_.magSf()[wallCellI]*(T_-T_sat_);
+			
+//Info << "patch time = " << faceTimePatch << "\t" << "qFlux = " << qFlux_sgsPatch;
 		}	
 	}
-	//Calculate volumetric SGS phase change rate in the cell	
+	//Calculate volumetric SGS phase change rate in the cell
+	
 	Q_pc_sgs_.internalField() = fvc::surfaceIntegrate( (1-alpha1f)*qFlux_sgs_*mesh_.magSf() )*(T_-T_sat_);
 
 	//decaying Phase Change Heat per unit volume
