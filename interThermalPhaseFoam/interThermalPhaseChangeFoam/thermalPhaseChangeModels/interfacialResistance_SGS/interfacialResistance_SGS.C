@@ -114,7 +114,7 @@ Foam::thermalPhaseChangeModels::interfacialResistance_SGS::interfacialResistance
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar( "dummy", dimensionSet(0,0,1,0,0,0,0), 15E-1 )
+        dimensionedScalar( "dummy", dimensionSet(0,0,1,0,0,0,0), 0 )
     ),
 	T_sp_coeff_
     (
@@ -200,8 +200,8 @@ Foam::thermalPhaseChangeModels::interfacialResistance_SGS::interfacialResistance
 	v_lv( (32.0/twoPhaseProperties_.rho2().value()) - (1.0/twoPhaseProperties_.rho1().value()) ),
 	hi( (2.0*sigmaHat.value()/(2.0-sigmaHat.value())) * (h_lv_.value()*h_lv_.value()/(T_sat_.value()*v_lv)) * pow(1.0/(2.0*3.1416*R_g.value()*T_sat_.value()),0.5) ),
 	C_1 ( 8.379E5 ),
-	C_2 ( -0.2356 ),
-	C_3 ( 15E-1 )
+	C_2 ( -0.2356 )//,
+	//C_3 ( 7E-4 )
 {
 	//Read in the cond/evap int. thresholds
 	thermalPhaseChangeProperties_.lookup("CondThresh") >> CondThresh;
@@ -308,7 +308,7 @@ Info << "dtUtilizedByTheThermalPhaseChangeModel = " << dT.value() << endl;
 	T_sp_coeff_.internalField() = hi*interfaceArea/mesh_.V();
 	T_sc_coeff_.internalField() = -hi*interfaceArea*T_sat_/mesh_.V();
 	Q_pc_.internalField() = hi*interfaceArea*(T_-T_sat_)/mesh_.V(); 
-	Q_pc_sgs_.internalField() = 0.0;
+	//Q_pc_sgs_.internalField() = 0.0;
 	forAll(mesh_.cells(),pI)
 	{
 		threshold_[pI] = ( (alpha1_[pI] >= 0.00) && (alpha1_[pI] <= 1.00) ) ? 1.0 : 0.0; 
@@ -328,7 +328,7 @@ Info << "dtUtilizedByTheThermalPhaseChangeModel = " << dT.value() << endl;
 			scalarField& wetPatch = wet.boundaryField()[pI];  
 			scalarField& alphaPatch = alpha1f.boundaryField()[pI];
 			scalarField& qFlux_sgsPatch = qFlux_sgs_.boundaryField()[pI];
-			
+
 			forAll(wetPatch, fI) 
 			{
 				wetPatch[fI] = ( (alphaPatch[fI] > 0.9) || ((wetPatch[fI] == 1.0) && (alphaPatch[fI] > 0.1)) ) ? 1.0 : 0.0;
@@ -338,23 +338,26 @@ Info << "dtUtilizedByTheThermalPhaseChangeModel = " << dT.value() << endl;
 			
 			forAll(faceTimePatch, fI)
 			{			
-				label wallCellI = mesh_.boundary()[pI].faceCells()[fI];		
+				//label wallCellI = mesh_.boundary()[pI].faceCells()[fI];		
 				if(faceTimePatch[fI] <= 0.0)
 				{
 
 					qFlux_sgsPatch[fI] = (1.0-wetPatch[fI])*C_1*pow(SMALL,C_2);  // It's actually heat transfer coefficient
-					Q_pc_sgs_[wallCellI] = (1-alpha1f[wallCellI])*qFlux_sgsPatch[fI]*mag(mesh_.Sf()[fI])*(T_[wallCellI]-T_sat_.value());
+					//Q_pc_sgs_[wallCellI] = (1-alpha1f[wallCellI])*qFlux_sgsPatch[fI]*mag(mesh_.Sf()[fI])*(T_[wallCellI]-T_sat_.value());
+					//Q_pc_sgs_[wallCellI] = (1-alpha1f[wallCellI])*qFlux_sgsPatch[fI]*(mesh_.boundary()[pI].magSf()[fI])*(T_[wallCellI]-T_sat_.value());
+						
 				}
-				else if(faceTimePatch[fI] > 0.0 && faceTimePatch[fI] <= C_3)
+				else //if(faceTimePatch[fI] > 0.0 && faceTimePatch[fI] <= C_3)
 				{
 					qFlux_sgsPatch[fI] = (1.0-wetPatch[fI])*C_1*pow(faceTimePatch[fI],C_2);
-					Q_pc_sgs_[wallCellI] = (1-alpha1f[wallCellI])*qFlux_sgsPatch[fI]*mag(mesh_.Sf()[fI])*(T_[wallCellI]-T_sat_.value());
+					//Q_pc_sgs_[wallCellI] = (1-alpha1f[wallCellI])*qFlux_sgsPatch[fI]*mag(mesh_.Sf()[fI])*(T_[wallCellI]-T_sat_.value());
+					//Q_pc_sgs_[wallCellI] = (1-alpha1f[wallCellI])*qFlux_sgsPatch[fI]*(mesh_.boundary()[pI].magSf()[fI])*(T_[wallCellI]-T_sat_.value());
 				}
-				else
-				{
-					qFlux_sgsPatch[fI] = 0.0;
-					Q_pc_sgs_[wallCellI] = 0.0;
-				}			
+				//else
+				//{
+				//	qFlux_sgsPatch[fI] = 0.0;
+				//	Q_pc_sgs_[wallCellI] = 0.0;
+				//}			
 			}
 			
 			//Q_pc_sgs_.internalField()[wallCellI] = (1-alpha1f[wallCellI])*qFlux_sgsPatch*mesh_.magSf()[wallCellI]*(T_-T_sat_);

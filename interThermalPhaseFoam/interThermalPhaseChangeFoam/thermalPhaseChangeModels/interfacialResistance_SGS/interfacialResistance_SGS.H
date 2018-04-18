@@ -120,7 +120,7 @@ class interfacialResistance_SGS
 	double C_2; 
 
 	// threshold time
-	double C_3;
+	//double C_3;
 	
 
 public:
@@ -165,6 +165,18 @@ public:
 		tmp<volScalarField> T_sc_coeff() const
 		{
 			return T_sc_coeff_;
+		}
+		tmp<volScalarField> PCV() const
+		{
+		    return tmp<volScalarField> ( 0.0*( (Q_pc_+Q_pc_sgs_) / h_lv_)*( (scalar(1.0)/twoPhaseProperties_.rho2()) - (scalar(1.0)/twoPhaseProperties_.rho1()) ) );
+		}
+		
+		        //- Return volumetric production rate of the alpha1 field due to phase change
+			//  This is positive in the case of condensation, or negative
+			//  for evaporation, units (1/s)
+		tmp<volScalarField> alpha1Gen() const
+		{
+	       	    return tmp<volScalarField>( -(Q_pc_) / (twoPhaseProperties_.rho1()  * h_lv_) );
 		}
 
         	
