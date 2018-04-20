@@ -120,7 +120,7 @@ class interfacialResistance_SGS
 	double C_2; 
 
 	// threshold time
-	//double C_3;
+	double C_3;
 	
 
 public:

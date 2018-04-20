@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
         //For now, the energy equation is only 1-way coupled with the momentum/pressure equations,
         //so it can be solved explicitly, and separately here
-        #include "TEqn.H"
+        #include "TEqn1.H"
 
 	Info<< "****Phase change energy: " << gSum( phaseChangeModel->Q_pc()*mesh.V() ) << " W" << endl;
 
