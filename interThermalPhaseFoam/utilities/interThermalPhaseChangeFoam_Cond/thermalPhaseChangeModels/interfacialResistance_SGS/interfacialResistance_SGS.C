@@ -201,7 +201,7 @@ Foam::thermalPhaseChangeModels::interfacialResistance_SGS::interfacialResistance
 	hi( (2.0*sigmaHat.value()/(2.0-sigmaHat.value())) * (h_lv_.value()*h_lv_.value()/(T_sat_.value()*v_lv)) * pow(1.0/(2.0*3.1416*R_g.value()*T_sat_.value()),0.5) ),
 	C_1 ( 8.379E5 ),
 	C_2 ( -0.2356 ),
-	C_3 ( 15E-1 )
+	C_3 ( 3E-4 )
 
 {
 	//Read in the cond/evap int. thresholds
