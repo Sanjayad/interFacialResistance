@@ -9,27 +9,23 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
+    class       volVectorField;
     location    "0";
-    object      alpha1;
+    object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform 0;
+internalField   uniform (0 0 0);
 
 boundaryField
 {
-    	backWall
-    	{
-        	type            dynamicKistlerAlphaContactAngle;
-        	thetaA          100;
-        	thetaR          80;
-        	muEffKistler    muDynamic;
-        	sigmaKistler    sigmaDynamic;
-		value           uniform 0;
-    	}
+    backWall
+    {
+        type            fixedValue;
+		value           uniform (0 0 0);
+    }
 
 	FrontNBack_pos
 	{
@@ -48,9 +44,7 @@ boundaryField
 
 	freeStream
 	{
-		type            inletOutlet;
-		value           uniform 0;
-		inletValue      uniform 0;
+		type            zeroGradient;
 	}
 }
 

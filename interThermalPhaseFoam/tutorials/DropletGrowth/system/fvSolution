@@ -17,6 +17,7 @@ FoamFile
 
 solvers
 {
+
 	//Needed for implicit solve of alpha1 in phase change code
     alpha1
     {
@@ -92,45 +93,6 @@ solvers
         maxIter         25;
     }
 
-	pc
-    {
-        solver          GAMG;
-        tolerance       1e-08;
-        relTol          1e-06;
-        smoother        DICGaussSeidel;
-        nPreSweeps      0;
-        nPostSweeps     2;
-        cacheAgglomeration true;
-        nCellsInCoarsestLevel 10;
-        agglomerator    faceAreaPair;
-        mergeLevels     1;
-		maxIter			25;
-    }
-
-    pcFinal
-    {
-        solver          PCG;
-        preconditioner
-        {
-            preconditioner  GAMG;
-            tolerance       1e-08;
-            relTol          0;
-            nVcycles        2;
-            smoother        DICGaussSeidel;
-            nPreSweeps      0;
-            nPostSweeps     2;
-            nFinestSweeps   2;
-            cacheAgglomeration false;
-            nCellsInCoarsestLevel 10;
-            agglomerator    faceAreaPair;
-            mergeLevels     1;
-        }
-        tolerance       1e-08;
-        relTol          0;
-        maxIter         25;
-    }
-
-
     "(U|k|epsilon)"
     {
         solver          PBiCG;
@@ -163,7 +125,7 @@ solvers
         relTol          0;
     }
 
-    H
+    T
     {
         solver          PBiCG;
         preconditioner  DILU;
@@ -181,19 +143,19 @@ PIMPLE
     nNonOrthogonalCorrectors 1;
     nAlphaCorr      1;
     nAlphaSubCycles 3;
- //   cAlpha          1;
+	nEnergySubCycles 1000;
     nEnergyLoops    3;
+	pRefCell		0;
+	pRefValue       0;   
+	pcRefCell		0;
+	pcRefValue       0;    
 
-	 pRefValue       0;    
-	pRefPoint (0 0 0);
-
-    pcRefValue       0;    
-	pcRefPoint (0 0 0);
 }
 
 relaxationFactors
 {
 }
+
 
 
 // ************************************************************************* //

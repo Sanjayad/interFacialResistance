@@ -11,25 +11,21 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      alpha1;
+    object      T;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform 0;
+internalField   uniform 373; //Initialize to the saturation temperature, but the wall is subcooled
 
 boundaryField
 {
-    	backWall
-    	{
-        	type            dynamicKistlerAlphaContactAngle;
-        	thetaA          100;
-        	thetaR          80;
-        	muEffKistler    muDynamic;
-        	sigmaKistler    sigmaDynamic;
-		value           uniform 0;
-    	}
+    backWall
+    {
+        type            fixedValue;
+		value           uniform 363;
+    }
 
 	FrontNBack_pos
 	{
@@ -48,9 +44,7 @@ boundaryField
 
 	freeStream
 	{
-		type            inletOutlet;
-		value           uniform 0;
-		inletValue      uniform 0;
+		type            zeroGradient;
 	}
 }
 

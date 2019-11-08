@@ -1,4 +1,5 @@
 #!/bin/bash
+source cleanup.sh
 rm 0/* DataSummary.dat foam.log
 cp A/* 0/
 unset FOAM_SIGFPE
@@ -21,4 +22,8 @@ fi
 makeAxialMesh -overwrite
 collapseEdges -overwrite
 setFields
+
+interThermalPhaseChangeFoam
+
+
 

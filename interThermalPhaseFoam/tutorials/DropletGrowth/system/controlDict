@@ -142,7 +142,8 @@ functions
 );
 
 
-libs ( "libgroovyBC.so"
+libs ( "libDynamicKistlerContactAngle.so"
+       "libgroovyBC.so"
        "libsimpleSwakFunctionObjects.so"
        "libswakFunctionObjects.so"
        "libOpenFOAM.so" );

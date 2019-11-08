@@ -140,7 +140,7 @@ tmp<scalarField> dynamicKistlerAlphaContactAngleFvPatchScalarField::theta
         FatalErrorIn
         (
             "dynamicKistlerAlphaContactAngleFvPatchScalarField"
-        )   << " muEffKistler or sigma set inconsitently, muEffKistler = " << muName_
+        )   << " muEffKistler or sigma set inconsistently, muEffKistler = " << muName_
             << ", sigmaKistler = " << sigmaName_ << '.' << nl
             << "    Set both muEffKistler and sigmaKistler according to the "
            "definition of dynamicKistlerAlphaContactAngle"
